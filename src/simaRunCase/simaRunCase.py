@@ -327,7 +327,7 @@ class SimaRunCase():
 
 
     @staticmethod
-    def addRunCondition(inpDict, simaTask, outFolder, envCond, wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond'):
+    def addRunCondition(inpDict, simaTask, outFolder, envCond, wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond', analysis = 'dynamic'):
 
         '''
         Adds a condition set and a work flow 
@@ -335,7 +335,7 @@ class SimaRunCase():
 
         SimaRunCase.addConditionSet(task = simaTask, condName = condName, envCond = envCond, varList = inpDict)
 
-        wfTask = SimaRunCase.addWorkFlow(simaTask, resultFileName = inpDict['__name__'], analysis = 'dynamic', condName = condName, wfName = wfName, wfTaskName = wfTaskName)
+        wfTask = SimaRunCase.addWorkFlow(simaTask, resultFileName = inpDict['__name__'], analysis = analysis, condName = condName, wfName = wfName, wfTaskName = wfTaskName)
 
         os.makedirs(outFolder, exist_ok=True)
 
@@ -343,7 +343,7 @@ class SimaRunCase():
         SimaRunCase.writeSimaJson([simaTask, wfTask], os.path.join(outFolder, f'{inpDict["__name__"]}.json'), openPathFlag = False)
 
     
-    def evalSima(self, varDict, envCond, wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond'):
+    def evalSima(self, varDict, envCond, wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond', analysis = 'dynamic'):
         '''
         Function to evaluate the sima model with the sima variables set in the varDict
         
@@ -354,7 +354,7 @@ class SimaRunCase():
 
         #add run variables, condition set, workflow and write the json file
         SimaRunCase.addRunCondition(varDict, simaTask, os.path.join(self.baseWorkspace, 'jsonFiles'), envCond, 
-                                    wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond')
+                                    wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond', analysis = analysis)
         
         #run the json file
         SimaRunCase.runWorkFlow(workspace_dir = os.path.join(self.baseWorkspace, 'runFolder', varDict["__name__"]), 

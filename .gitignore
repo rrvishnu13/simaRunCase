@@ -1,0 +1,95 @@
+# Byte-compiled / optimized 
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/*.pyc
+**/*.class
+**/*.jar
+**/*.war
+**/*.mod
+**/*.obj
+
+
+#Distribution / packaging
+**/*.Python
+**/build/
+**/develop-eggs/
+**/dist/
+**/eggs/
+**/*.eggs/
+# lib/
+# lib64/
+# parts/
+# sdist/
+# var/
+# wheels/
+# share/python-wheels/
+**/*.egg-info/
+**/*.installed.cfg
+**/*.egg
+**/MANIFEST
+**/*.manifest
+**/*.embed.manifest.rc
+**/*.embed.manifest.res
+**/*.exp
+**/*.lib
+
+# Installer logs
+**/pip-log.txt
+**/pip-delete-this-directory.txt
+
+
+
+# Jupyter Notebook
+**/*.ipynb_checkpoints
+
+
+# IPython
+**/profile_default/
+**/python_config.py
+
+
+#Figures
+**/*.png
+**/*.svg
+**/*.eps
+**/*.gif
+
+#IDE
+**/*.spyderproject
+**/*.spyproject
+**/*.vs
+**/*.vscode/
+
+#MIsc
+**/*.asv
+**/*.lyx#
+**/*.lyx~
+**/*.html
+**/*.htm
+
+
+#test data folder
+**/testData/
+
+# **/*.json
+**/*.ascii
+**/*.yaml
+**/*.suo
+
+#RAFT related
+
+# HAMS-generated data
+raft/data/cylinder/Output/Hams_format/
+raft/data/cylinder/Output/Hydrostar_format/
+
+# BEM meshing processes generated data
+raft/BEM/
+raft/HullMesh.pnl
+raft/platform.gdf
+tests/BEM/
+tests/platform.gdf
+
+# Emacs
+*~
+

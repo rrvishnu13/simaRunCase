@@ -13,24 +13,9 @@ import os
 import shutil
 
 import subprocess
-import platform
-
 import glob
 
-hostname = platform.node()
 
-if hostname == 'NTNU05268':
-    #SIMA 4.8.0
-    os.environ["SRE_EXE"] = r"C:\Softwares\SIMA\sima480\sre.exe"
-    os.environ["SIMA_EXE"] = r"C:\Softwares\SIMA\sima480\Sima.exe"
-    #SIMA 4.6.4
-    # os.environ["SRE_EXE"] = r"C:\Softwares\SIMA\sima464/sre.exe"
-    # os.environ["SIMA_EXE"] = r"C:\Softwares\SIMA\sima464/sima.exe"
-else : #server 14, 1
-    os.environ["SRE_EXE"] = r"W:\sima480\sre.exe"
-    os.environ["SIMA_EXE"] = r"W:\sima480\sima.exe"
-# else:
-#     raise NotImplementedError('Please set SIMAPy environment variables for hostname %s'%hostname) 
 
 
 class SimaRunCase():

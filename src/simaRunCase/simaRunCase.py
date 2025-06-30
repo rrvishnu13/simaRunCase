@@ -4,6 +4,8 @@ from simapy import sre
 from simapy.sima_reader import SIMAReader
 from simapy.sima_writer import SIMAWriter
 
+import multiprocessing
+from functools import partial
 from pathlib import Path
 
 import copy
@@ -71,7 +73,7 @@ class SimaRunCase():
         sima.run(workspace, commands)
 
     @staticmethod
-    def runWorkFlow(workspace_dir, json_file, workFlowTask, workFlow, addStaskFile=None, copyHdf5Flag = False):
+    def runWorkFlow(workspace_dir, json_file, workFlowTask, workFlow, addStaskFile=None, copyHdf5Flag = False, deleteRunFol = False):
         '''
         copyHdf5Flag : the hdf5 file is copied to a results folder located just above the workspace directory
         '''
@@ -101,7 +103,9 @@ class SimaRunCase():
                 if os.path.exists(os.path.join(workspace_dir, '../../h5Results', os.path.basename(sourceFile))):
                     os.remove(os.path.join(workspace_dir, '../../h5Results', os.path.basename(sourceFile)))
                 shutil.move(sourceFile, os.path.join(workspace_dir, '../../h5Results'))
-                shutil.rmtree(workspace_dir, ignore_errors=True)
+                
+                if deleteRunFol:
+                    shutil.rmtree(workspace_dir, ignore_errors=True)
 
     #---------------------------json creation functions--------------------------------
 
@@ -343,7 +347,7 @@ class SimaRunCase():
         SimaRunCase.writeSimaJson([simaTask, wfTask], os.path.join(outFolder, f'{inpDict["__name__"]}.json'), openPathFlag = False)
 
     
-    def evalSima(self, varDict, envCond, wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond', analysis = 'dynamic'):
+    def evalSima(self, varDict, envCond, wfTaskName = 'testWF_task', wfName = 'testWF', condName = 'testCond', analysis = 'dynamic', deleteRunFol = False):
         '''
         Function to evaluate the sima model with the sima variables set in the varDict
         
@@ -362,7 +366,18 @@ class SimaRunCase():
                                 workFlowTask = wfTaskName, 
                                 workFlow = wfName, 
                                 addStaskFile=self.addStaskFile, 
-                                copyHdf5Flag = True)
+                                copyHdf5Flag = True,
+                                deleteRunFol = deleteRunFol)
         
 
 
+def runCases(simRunObj, varDictList, envCond, maxCores = multiprocessing.cpu_count()//2, wfTaskName = 'testWF_task', wfName = 'testWF', 
+             condName = 'testCond', analysis = 'dynamic', deleteRunFol = False):
+    
+    nCores = min(maxCores, multiprocessing.cpu_count()-2, len(varDictList))
+    
+    with multiprocessing.Pool(nCores) as pool:
+        pool.map(partial(simRunObj.evalSima, envCond=envCond, wfTaskName = wfTaskName, 
+                         wfName = wfName, condName = condName, analysis = analysis, deleteRunFol = deleteRunFol), varDictList)
+        
+    

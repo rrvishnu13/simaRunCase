@@ -41,7 +41,9 @@ class SimaRunCase():
 
         #Read the base sima json file
         self.simaTask = SIMAReader().read(os.path.join(self.baseWorkspace, os.path.basename(baseJsonFile)))[0]
-
+        
+        if isinstance(self.simaTask, sima.sima.TaskFolder): 
+            self.simaTask = self.simaTask.childTasks[0] #TODO : better way to identify the task to run
 
     #---------------------------sima json runner functions--------------------------------
 

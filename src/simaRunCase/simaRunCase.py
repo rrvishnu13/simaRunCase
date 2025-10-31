@@ -358,13 +358,65 @@ class SimaRunCase():
         
 
 
-def runCases(simRunObj, varDictList, envCond, maxCores = multiprocessing.cpu_count()//2, wfTaskName = 'testWF_task', wfName = 'testWF', 
+def runCases_condSets(simRunObj, varDictList, envCond, maxCores = multiprocessing.cpu_count()//2, wfTaskName = 'testWF_task', wfName = 'testWF', 
              condName = 'testCond', analysis = 'dynamic', deleteRunFol = False):
     
+    '''
+    One model run with a set of conditions - all using the same simaRunObj
+    '''
     nCores = min(maxCores, multiprocessing.cpu_count()-2, len(varDictList))
     
     with multiprocessing.Pool(nCores) as pool:
         pool.map(partial(simRunObj.evalSima, envCond=envCond, wfTaskName = wfTaskName, 
                          wfName = wfName, condName = condName, analysis = analysis, deleteRunFol = deleteRunFol), varDictList)
         
+
+def worker(args):
+                simObj, varDict, envCond, wfTaskName, wfName, condName, analysis, deleteRunFol = args
+                return simObj.evalSima(
+                                        varDict,
+                                        envCond=envCond,
+                                        wfTaskName=wfTaskName,
+                                        wfName=wfName,
+                                        condName=condName,
+                                        analysis=analysis,
+                                        deleteRunFol=deleteRunFol)
+
+
+def runCases_modelSets( simaRunObjList, varDictList, envCond, 
+                        maxCores = multiprocessing.cpu_count() // 2, 
+                        wfTaskName = 'testWF_task', wfName = 'testWF', 
+                        condName = 'testCond', analysis = 'dynamic', deleteRunFol = False):
+    """
+    Run multiple simaRunObj.evalSima calls in parallel, each with its own varDict.
+
+    If maxCores is set to 1, the case wil be run serially --> for debuging purposes
+
+    """
+
+    assert len(simaRunObjList) == len(varDictList), "simaRunObjList and varDictList must have the same length."
     
+
+    if maxCores > 1:
+
+        nCores = min(maxCores, multiprocessing.cpu_count() - 2, len(simaRunObjList))
+        
+        # Prepare argument tuples for each case
+        argsList = [    (simObj, varDict, envCond, wfTaskName, wfName, condName, analysis, deleteRunFol)
+                        for simObj, varDict in zip(simaRunObjList, varDictList)]
+        
+        
+        with multiprocessing.Pool(nCores) as pool:
+            pool.map(worker, argsList)
+
+    else:
+
+        for simaRunObj, varDict in zip(simaRunObjList, varDictList):
+            simaRunObj.evalSima(
+                varDict,
+                envCond=envCond,
+                wfTaskName=wfTaskName,
+                wfName=wfName,
+                condName=condName,
+                analysis=analysis,
+                deleteRunFol=deleteRunFol)

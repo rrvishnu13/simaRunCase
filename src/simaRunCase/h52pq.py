@@ -18,8 +18,8 @@ def flatten_h5(h5obj, path=''):
             datasets.update(flatten_h5(item, path=item_path))
     return datasets
 
-def h52pq(h5File):
 
+def h52pq(h5File):
 
     df_dict = {}
 
@@ -57,14 +57,27 @@ def h52pq(h5File):
     dt_min = min(np.diff(df.index).min() for df in df_dict.values())
 
     t_common = np.arange(t_min, t_max + dt_min, dt_min)
-    index = pd.Index(t_common, name='t')
+   
 
     # resample all series on common index
     aligned = []
     for name, df in df_dict.items():
-        df_re = df.reindex(index).interpolate().bfill().ffill()
+        # df_re = df.reindex(index).interpolate().bfill().ffill()
+        df_re = pd.DataFrame(
+                                {
+                                    col: np.interp(
+                                                        t_common, df.index, df[col],
+                                                        left=df[col].iloc[0], #for riflex data which starts one time step later
+                                                        right=df[col].iloc[-1]
+                                                    )
+                                    for col in df.columns 
+                                },
+                                index=t_common
+                            )
+      
         aligned.append(df_re)
 
+    
     df_common = pd.concat(aligned, axis=1)
 
     df_common = df_common.reset_index()  # index becomes a column
